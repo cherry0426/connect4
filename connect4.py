@@ -5,6 +5,7 @@ import math
 
 NO_OF_ROWS = 6
 NO_OF_COLUMNS = 7
+
 blue = (0, 0, 255)
 black = (0, 0 ,0)
 red = (255, 0, 0)
@@ -51,7 +52,7 @@ def winning_move(board, piece):
             if board[r][c] == piece and board[r - 1][c + 1] == piece and board[r - 2][c + 2] == piece and board[r - 3][c + 3] == piece:
                 return(True)
 
-
+#flipping board
 def print_board(board):
     print(np.flip(board,0))
 
@@ -86,13 +87,24 @@ screen = pygame.display.set_mode(size)
 draw_board(board)
 pygame.display.update()
 
+myfont = pygame.font.SysFont("monospace", 75)
+
 while not game_over:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
 
+        if event.type == pygame.MOUSEMOTION:
+            pygame.draw.rect(screen, black, (0,0, width, square_size))
+            posx = event.pos[0]
+            if turn == 0:
+                pygame.draw.circle(screen, red, (posx, int(square_size / 2)), radius)
+            else:
+                pygame.draw.circle(screen, yellow, (posx, int(square_size / 2)), radius)
+        pygame.display.update()
+
         if event.type == pygame.MOUSEBUTTONDOWN:
-            print(event.pos)
+            pygame.draw.rect(screen, black, (0,0, width, square_size))
 
             if turn == 0:
 
@@ -111,7 +123,9 @@ while not game_over:
                     drop_piece(board, row, col, 1)
 
                     if winning_move(board, 1):
-                        print_board(board)
+                        # print_board(board)
+                        label = myfont.render("Player 1 wins!!", 1, red)
+                        screen.blit(label, (40,10))
                         print("Player 1 Wins!")
                         game_over = True
 
@@ -134,7 +148,9 @@ while not game_over:
                     drop_piece(board, row, col, 2)
 
                     if winning_move(board, 2):
-                        print_board(board)
+                        # print_board(board)
+                        label = myfont.render("Player 2 wins!!", 1, yellow)
+                        screen.blit(label, (40,10))
                         print("Player 2 Wins!")
                         game_over = True
 
@@ -142,4 +158,7 @@ while not game_over:
 
     print_board(board)
     draw_board(board)
+
+    if game_over:
+        pygame.time.wait(2000)
 
