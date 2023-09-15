@@ -2,9 +2,13 @@ import numpy as np
 import pygame
 import sys
 import math
+import random
 
 NO_OF_ROWS = 6
-NO_OF_COLUMNS = 9
+NO_OF_COLUMNS = 7
+
+player = 0
+AI = 1
 
 blue = (0, 0, 255)
 black = (0, 0 ,0)
@@ -74,7 +78,7 @@ board = create_board()
 print_board(board)
 
 game_over = False
-turn = 0
+turn = player
 
 pygame.init()
 
@@ -103,13 +107,13 @@ while not game_over:
                 pygame.draw.circle(screen, yellow, (posx, int(square_size / 2)), radius)
         pygame.display.update()
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            pygame.draw.rect(screen, black, (0,0, width, square_size))
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        pygame.draw.rect(screen, black, (0,0, width, square_size))
 
-            if turn == 0:
+        if turn == 0:
 
-                posx = event.pos[0]
-                col = int(math.floor(posx/square_size))
+            posx = event.pos[0]
+            col = int(math.floor(posx/square_size))
 
                 # while True:
                     # col = int(input("Player 1's turn, select a value between 0-6:"))
@@ -118,46 +122,43 @@ while not game_over:
                     # else:
                     #     break
 
-                if is_valid_location(board, col):
-                    row = get_next_open_row(board, col)
-                    drop_piece(board, row, col, 1)
+            if is_valid_location(board, col):
+                row = get_next_open_row(board, col)
+                drop_piece(board, row, col, 1)
 
-                    if winning_move(board, 1):
+                if winning_move(board, 1):
                         # print_board(board)
-                        label = myfont.render("Player 1 wins!!", 1, red)
-                        screen.blit(label, (40,10))
-                        print("Player 1 Wins!")
-                        game_over = True
+                    label = myfont.render("Player 1 wins!!", 1, red)
+                    screen.blit(label, (40,10))
+                    print("Player 1 Wins!")
+                    game_over = True
 
-                turn  = 1
+                turn += 1
+                turn = turn % 2
+                print_board(board)
+                draw_board(board)
 
-            #player 2
-            else:
-                posx = event.pos[0]
-                col = int(math.floor(posx/square_size))
+    #player 2 AI
+    if turn == AI and not game_over:
+        col = random.randint(0, NO_OF_COLUMNS - 1)
 
-                # while True:
-                    # col = int(input("Player 2's turn, select a value between 0-6:"))
-                    # if col < 0 or col > 6:
-                    #     print("Invalid Move. Please select a value between 0 and 6.")
-                    # else:
-                    #     break
+        if is_valid_location(board, col):
+            pygame.time.wait(500)
+            row = get_next_open_row(board, col)
+            drop_piece(board, row, col, 2)
 
-                if is_valid_location(board, col):
-                    row = get_next_open_row(board, col)
-                    drop_piece(board, row, col, 2)
+            if winning_move(board, 2):
+                # print_board(board)
+                label = myfont.render("Player 2 wins!!", 1, yellow)
+                screen.blit(label, (40,10))
+                print("Player 2 Wins!")
+                game_over = True
 
-                    if winning_move(board, 2):
-                        # print_board(board)
-                        label = myfont.render("Player 2 wins!!", 1, yellow)
-                        screen.blit(label, (40,10))
-                        print("Player 2 Wins!")
-                        game_over = True
+            print_board(board)
+            draw_board(board)
 
-                turn = 0
-
-    print_board(board)
-    draw_board(board)
+        turn += 1
+        turn = turn % 2
 
     if game_over:
         pygame.time.wait(2000)
